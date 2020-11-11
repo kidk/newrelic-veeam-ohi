@@ -10,7 +10,6 @@
 
 For creating and maintaining the Grafana exporter: https://github.com/jorgedlcruz/veeam_grafana
 
-
 - Markus Kraus
 
 For creating the original PRTG script: https://github.com/mycloudrevolution/Advanced-PRTG-Sensors/blob/master/Veeam/PRTG-VeeamBRStats.ps1
