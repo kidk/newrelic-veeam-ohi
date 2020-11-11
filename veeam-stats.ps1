@@ -8,12 +8,7 @@ param(
     [Parameter(Position=0, Mandatory=$false)]
         [string] $BRHost = "127.0.0.1",
     [Parameter(Position=1, Mandatory=$false)]
-        $interval = "5", # Number of minutes
-    [Parameter(Position=2, Mandatory=$false)]
-        $repoCritical = 10,
-    [Parameter(Position=3, Mandatory=$false)]
-        $repoWarn = 20
-
+        $interval = "5" # Number of minutes
 )
 
 #region: Start Load VEEAM Snapin (if not already loaded)
@@ -156,12 +151,7 @@ $RepoReport = $repoList | Get-vPCRepoInfo | Select-Object       @{Name="Reposito
                                                                 @{Name="Path"; Expression = {$_.Storepath}},
                                                                 @{Name="Free (GB)"; Expression = {$_.StorageFree}},
                                                                 @{Name="Total (GB)"; Expression = {$_.StorageTotal}},
-                                                                @{Name="Free (%)"; Expression = {$_.FreePercentage}},
-                                                                 @{Name="Status"; Expression = {
-                                                                If ($_.FreePercentage -lt $repoCritical) {"Critical"}
-                                                                ElseIf ($_.FreePercentage -lt $repoWarn) {"Warning"}
-                                                                ElseIf ($_.FreePercentage -eq "Unknown") {"Unknown"}
-                                                                Else {"OK"}}} | `
+                                                                @{Name="Free (%)"; Expression = {$_.FreePercentage}} | `
                                                                 Sort "Repository Name"
 #endregion
 
