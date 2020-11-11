@@ -86,7 +86,8 @@ if ($null -eq $NewConnection ) {
 #region: Collect and filter Sessions
 
 # Get all Proxies
-$viProxyList = Get-VBRViProxy
+# Temporary disabled
+# $viProxyList = Get-VBRViProxy
 
 # Get all Repositories
 $repoList = Get-VBRBackupRepository
@@ -95,7 +96,8 @@ $repoList = Get-VBRBackupRepository
 $allSesh = Get-VBRBackupSession
 
 # Get all Restore Sessions
-$allResto = Get-VBRRestoreSession
+# Temporary disabled
+# $allResto = Get-VBRRestoreSession
 
 # Gather all Backup sessions within timeframe
 $seshListBk = @($allSesh | Where-Object{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "Backup"})
@@ -108,11 +110,14 @@ $seshListRepl = @($allSesh | Where-Object{($_.CreationTime -ge (Get-Date).AddMin
 
 #region: Collect Jobs
 # Gather Backup jobs
-$allJobsBk = @(Get-VBRJob | Where-Object {$_.JobType -eq "Backup"})
+# Temporary disabled
+# $allJobsBk = @(Get-VBRJob | Where-Object {$_.JobType -eq "Backup"})
 # Gather BackupCopy jobs
-$allJobsBkC = @(Get-VBRJob | Where-Object {$_.JobType -eq "BackupSync"})
+# Temporary disabled
+# $allJobsBkC = @(Get-VBRJob | Where-Object {$_.JobType -eq "BackupSync"})
 # Get Replica jobs
-$repList = @(Get-VBRJob | Where-Object{$_.IsReplica})
+# Temporary disabled
+# $repList = @(Get-VBRJob | Where-Object{$_.IsReplica})
 #endregion
 
 #region: Get Backup session informations
@@ -171,6 +176,7 @@ $metrics += @{
         "FailesBackups" = $failsSessionsBk.Count
         "FailedBackups" = $failedSessionsBk.Count
         "RunningBackups" = $runningSessionsBk.Count
+        "SuccesBackupCopys" = $successSessionsBkC.Count
         "WarningBackupCopys" = $warningSessionsBkC.Count
         "FailesBackupCopys" = $failsSessionsBkC.Count
         "FailedBackupCopys" = $failedSessionsBkC.Count
