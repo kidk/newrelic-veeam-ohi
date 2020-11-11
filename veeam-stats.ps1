@@ -89,27 +89,42 @@ if ($NewConnection -eq $null ) {
 #endregion
 
 #region: Collect and filter Sessions
-$vbrserverobj = Get-VBRLocalhost        # Get VBR Server object
-$viProxyList = Get-VBRViProxy           # Get all Proxies
-$repoList = Get-VBRBackupRepository     # Get all Repositories
-$allSesh = Get-VBRBackupSession         # Get all Sessions (Backup/BackupCopy/Replica)
-$allResto = Get-VBRRestoreSession       # Get all Restore Sessions
-$seshListBk = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "Backup"})           # Gather all Backup sessions within timeframe
-$seshListBkc = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "BackupSync"})      # Gather all BackupCopy sessions within timeframe
-$seshListRepl = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "Replica"})        # Gather all Replication sessions within timeframe
+
+# Get all Proxies
+$viProxyList = Get-VBRViProxy
+
+# Get all Repositories
+$repoList = Get-VBRBackupRepository
+
+# Get all Sessions (Backup/BackupCopy/Replica)
+$allSesh = Get-VBRBackupSession
+
+# Get all Restore Sessions
+$allResto = Get-VBRRestoreSession
+
+# Gather all Backup sessions within timeframe
+$seshListBk = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "Backup"})
+# Gather all BackupCopy sessions within timeframe
+$seshListBkc = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "BackupSync"})
+# Gather all Replication sessions within timeframe
+$seshListRepl = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "Replica"})
+
 #endregion
 
 #region: Collect Jobs
-$allJobsBk = @(Get-VBRJob | ? {$_.JobType -eq "Backup"})        # Gather Backup jobs
-$allJobsBkC = @(Get-VBRJob | ? {$_.JobType -eq "BackupSync"})   # Gather BackupCopy jobs
-$repList = @(Get-VBRJob | ?{$_.IsReplica})                      # Get Replica jobs
+# Gather Backup jobs
+$allJobsBk = @(Get-VBRJob | ? {$_.JobType -eq "Backup"})
+# Gather BackupCopy jobs
+$allJobsBkC = @(Get-VBRJob | ? {$_.JobType -eq "BackupSync"})
+# Get Replica jobs
+$repList = @(Get-VBRJob | ?{$_.IsReplica})
 #endregion
 
 #region: Get Backup session informations
 $totalxferBk = 0
 $totalReadBk = 0
-$seshListBk | %{$totalxferBk += $([Math]::Round([Decimal]$_.Progress.TransferedSize/1GB, 0))}
-$seshListBk | %{$totalReadBk += $([Math]::Round([Decimal]$_.Progress.ReadSize/1GB, 0))}
+$seshListBk | ForEach-Object{$totalxferBk += $([Math]::Round([Decimal]$_.Progress.TransferedSize/1GB, 0))}
+$seshListBk | ForEach-Object{$totalReadBk += $([Math]::Round([Decimal]$_.Progress.ReadSize/1GB, 0))}
 #endregion
 
 #region: Preparing Backup Session Reports
@@ -136,18 +151,18 @@ $failsSessionsRepl = @($seshListRepl | ?{$_.Result -eq "Failed"})
 $runningSessionsRepl = @($allSesh | ?{$_.State -eq "Working" -and $_.JobType -eq "Replica"})
 $failedSessionsRepl = @($seshListRepl | ?{($_.Result -eq "Failed") -and ($_.WillBeRetried -ne "True")})
 
-$RepoReport = $repoList | Get-vPCRepoInfo | Select     @{Name="Repository Name"; Expression = {$_.Target}},
-                                                       @{Name="Host"; Expression = {$_.RepoHost}},
-                                                       @{Name="Path"; Expression = {$_.Storepath}},
-                                                       @{Name="Free (GB)"; Expression = {$_.StorageFree}},
-                                                       @{Name="Total (GB)"; Expression = {$_.StorageTotal}},
-                                                       @{Name="Free (%)"; Expression = {$_.FreePercentage}},
-                                                       @{Name="Status"; Expression = {
-                                                       If ($_.FreePercentage -lt $repoCritical) {"Critical"}
-                                                       ElseIf ($_.FreePercentage -lt $repoWarn) {"Warning"}
-                                                       ElseIf ($_.FreePercentage -eq "Unknown") {"Unknown"}
-                                                       Else {"OK"}}} | `
-                                                       Sort "Repository Name"
+$RepoReport = $repoList | Get-vPCRepoInfo | Select-Object       @{Name="Repository Name"; Expression = {$_.Target}},
+                                                                @{Name="Host"; Expression = {$_.RepoHost}},
+                                                                @{Name="Path"; Expression = {$_.Storepath}},
+                                                                @{Name="Free (GB)"; Expression = {$_.StorageFree}},
+                                                                @{Name="Total (GB)"; Expression = {$_.StorageTotal}},
+                                                                @{Name="Free (%)"; Expression = {$_.FreePercentage}},
+                                                                 @{Name="Status"; Expression = {
+                                                                If ($_.FreePercentage -lt $repoCritical) {"Critical"}
+                                                                ElseIf ($_.FreePercentage -lt $repoWarn) {"Warning"}
+                                                                ElseIf ($_.FreePercentage -eq "Unknown") {"Unknown"}
+                                                                Else {"OK"}}} | `
+                                                                Sort "Repository Name"
 #endregion
 
 #region: Number of Endpoints
