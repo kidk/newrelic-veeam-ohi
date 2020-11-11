@@ -5,10 +5,10 @@
 
 [cmdletbinding()]
 param(
-    [Parameter(Position=0, Mandatory=$false)]
-        [string] $BRHost = "127.0.0.1",
-    [Parameter(Position=1, Mandatory=$false)]
-        $interval = "5" # Number of minutes
+        [Parameter(Position=0, Mandatory=$false)]
+                [string] $BRHost = "127.0.0.1",
+        [Parameter(Position=1, Mandatory=$false)]
+                $interval = "5" # Number of minutes
 )
 
 #region: Start Load VEEAM Snapin (if not already loaded)
