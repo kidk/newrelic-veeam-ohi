@@ -40,7 +40,7 @@ Function Get-vPCRepoInfo {
                                 FreePercentage = [Math]::Round(($free/$total)*100)
                         }
 
-                        Return $repoObj | Select Target, RepoHost, Storepath, StorageFree, StorageTotal, FreePercentage
+                        Return $repoObj | Select-Object Target, RepoHost, Storepath, StorageFree, StorageTotal, FreePercentage
                 }
         }
         Process {
@@ -69,7 +69,7 @@ Function Get-vPCRepoInfo {
 $OpenConnection = (Get-VBRServerSession).Server
 if($OpenConnection -eq $BRHost) {
 
-} elseif ($OpenConnection -eq $null ) {
+} elseif ($null -eq $OpenConnection ) {
         Connect-VBRServer -Server $BRHost
 } else {
         Disconnect-VBRServer
@@ -77,7 +77,7 @@ if($OpenConnection -eq $BRHost) {
 }
 
 $NewConnection = (Get-VBRServerSession).Server
-if ($NewConnection -eq $null ) {
+if ($null -eq $NewConnection ) {
         Write-Error "`nError: BRHost Connection Failed"
         Exit
 }
@@ -98,21 +98,21 @@ $allSesh = Get-VBRBackupSession
 $allResto = Get-VBRRestoreSession
 
 # Gather all Backup sessions within timeframe
-$seshListBk = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "Backup"})
+$seshListBk = @($allSesh | Where-Object{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "Backup"})
 # Gather all BackupCopy sessions within timeframe
-$seshListBkc = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "BackupSync"})
+$seshListBkc = @($allSesh | Where-Object{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "BackupSync"})
 # Gather all Replication sessions within timeframe
-$seshListRepl = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "Replica"})
+$seshListRepl = @($allSesh | Where-Object{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "Replica"})
 
 #endregion
 
 #region: Collect Jobs
 # Gather Backup jobs
-$allJobsBk = @(Get-VBRJob | ? {$_.JobType -eq "Backup"})
+$allJobsBk = @(Get-VBRJob | Where-Object {$_.JobType -eq "Backup"})
 # Gather BackupCopy jobs
-$allJobsBkC = @(Get-VBRJob | ? {$_.JobType -eq "BackupSync"})
+$allJobsBkC = @(Get-VBRJob | Where-Object {$_.JobType -eq "BackupSync"})
 # Get Replica jobs
-$repList = @(Get-VBRJob | ?{$_.IsReplica})
+$repList = @(Get-VBRJob | Where-Object{$_.IsReplica})
 #endregion
 
 #region: Get Backup session informations
@@ -123,28 +123,28 @@ $seshListBk | ForEach-Object{$totalReadBk += $([Math]::Round([Decimal]$_.Progres
 #endregion
 
 #region: Preparing Backup Session Reports
-$successSessionsBk = @($seshListBk | ?{$_.Result -eq "Success"})
-$warningSessionsBk = @($seshListBk | ?{$_.Result -eq "Warning"})
-$failsSessionsBk = @($seshListBk | ?{$_.Result -eq "Failed"})
-$runningSessionsBk = @($allSesh | ?{$_.State -eq "Working" -and $_.JobType -eq "Backup"})
-$failedSessionsBk = @($seshListBk | ?{($_.Result -eq "Failed") -and ($_.WillBeRetried -ne "True")})
+$successSessionsBk = @($seshListBk | Where-Object{$_.Result -eq "Success"})
+$warningSessionsBk = @($seshListBk | Where-Object{$_.Result -eq "Warning"})
+$failsSessionsBk = @($seshListBk | Where-Object{$_.Result -eq "Failed"})
+$runningSessionsBk = @($allSesh | Where-Object{$_.State -eq "Working" -and $_.JobType -eq "Backup"})
+$failedSessionsBk = @($seshListBk | Where-Object{($_.Result -eq "Failed") -and ($_.WillBeRetried -ne "True")})
 #endregion
 
 #region:  Preparing Backup Copy Session Reports
-$successSessionsBkC = @($seshListBkC | ?{$_.Result -eq "Success"})
-$warningSessionsBkC = @($seshListBkC | ?{$_.Result -eq "Warning"})
-$failsSessionsBkC = @($seshListBkC | ?{$_.Result -eq "Failed"})
-$runningSessionsBkC = @($allSesh | ?{$_.State -eq "Working" -and $_.JobType -eq "BackupSync"})
-$IdleSessionsBkC = @($allSesh | ?{$_.State -eq "Idle" -and $_.JobType -eq "BackupSync"})
-$failedSessionsBkC = @($seshListBkC | ?{($_.Result -eq "Failed") -and ($_.WillBeRetried -ne "True")})
+$successSessionsBkC = @($seshListBkC | Where-Object{$_.Result -eq "Success"})
+$warningSessionsBkC = @($seshListBkC | Where-Object{$_.Result -eq "Warning"})
+$failsSessionsBkC = @($seshListBkC | Where-Object{$_.Result -eq "Failed"})
+$runningSessionsBkC = @($allSesh | Where-Object{$_.State -eq "Working" -and $_.JobType -eq "BackupSync"})
+$IdleSessionsBkC = @($allSesh | Where-Object{$_.State -eq "Idle" -and $_.JobType -eq "BackupSync"})
+$failedSessionsBkC = @($seshListBkC | Where-Object{($_.Result -eq "Failed") -and ($_.WillBeRetried -ne "True")})
 #endregion
 
 #region: Preparing Replicatiom Session Reports
-$successSessionsRepl = @($seshListRepl | ?{$_.Result -eq "Success"})
-$warningSessionsRepl = @($seshListRepl | ?{$_.Result -eq "Warning"})
-$failsSessionsRepl = @($seshListRepl | ?{$_.Result -eq "Failed"})
-$runningSessionsRepl = @($allSesh | ?{$_.State -eq "Working" -and $_.JobType -eq "Replica"})
-$failedSessionsRepl = @($seshListRepl | ?{($_.Result -eq "Failed") -and ($_.WillBeRetried -ne "True")})
+$successSessionsRepl = @($seshListRepl | Where-Object{$_.Result -eq "Success"})
+$warningSessionsRepl = @($seshListRepl | Where-Object{$_.Result -eq "Warning"})
+$failsSessionsRepl = @($seshListRepl | Where-Object{$_.Result -eq "Failed"})
+$runningSessionsRepl = @($allSesh | Where-Object{$_.State -eq "Working" -and $_.JobType -eq "Replica"})
+$failedSessionsRepl = @($seshListRepl | Where-Object{($_.Result -eq "Failed") -and ($_.WillBeRetried -ne "True")})
 
 $RepoReport = $repoList | Get-vPCRepoInfo | Select-Object       @{Name="Repository Name"; Expression = {$_.Target}},
                                                                 @{Name="Host"; Expression = {$_.RepoHost}},
