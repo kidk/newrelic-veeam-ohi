@@ -8,7 +8,7 @@ param(
     [Parameter(Position=0, Mandatory=$false)]
         [string] $BRHost = "127.0.0.1",
     [Parameter(Position=1, Mandatory=$false)]
-        $reportMode = "24", # Weekly, Monthly as String or Hour as Integer
+        $interval = "5", # Number of minutes
     [Parameter(Position=2, Mandatory=$false)]
         $repoCritical = 10,
     [Parameter(Position=3, Mandatory=$false)]
@@ -88,25 +88,15 @@ if ($NewConnection -eq $null ) {
 }
 #endregion
 
-#region: Convert mode (timeframe) to hours
-If ($reportMode -eq "Monthly") {
-        $HourstoCheck = 720
-} Elseif ($reportMode -eq "Weekly") {
-        $HourstoCheck = 168
-} Else {
-        $HourstoCheck = $reportMode
-}
-#endregion
-
 #region: Collect and filter Sessions
 $vbrserverobj = Get-VBRLocalhost        # Get VBR Server object
 $viProxyList = Get-VBRViProxy           # Get all Proxies
 $repoList = Get-VBRBackupRepository     # Get all Repositories
 $allSesh = Get-VBRBackupSession         # Get all Sessions (Backup/BackupCopy/Replica)
 $allResto = Get-VBRRestoreSession       # Get all Restore Sessions
-$seshListBk = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddHours(-$HourstoCheck)) -and $_.JobType -eq "Backup"})           # Gather all Backup sessions within timeframe
-$seshListBkc = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddHours(-$HourstoCheck)) -and $_.JobType -eq "BackupSync"})      # Gather all BackupCopy sessions within timeframe
-$seshListRepl = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddHours(-$HourstoCheck)) -and $_.JobType -eq "Replica"})        # Gather all Replication sessions within timeframe
+$seshListBk = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "Backup"})           # Gather all Backup sessions within timeframe
+$seshListBkc = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "BackupSync"})      # Gather all BackupCopy sessions within timeframe
+$seshListRepl = @($allSesh | ?{($_.CreationTime -ge (Get-Date).AddMinutes(-$interval)) -and $_.JobType -eq "Replica"})        # Gather all Replication sessions within timeframe
 #endregion
 
 #region: Collect Jobs
