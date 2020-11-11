@@ -1,0 +1,5 @@
+integrations:
+    # Any free-form integration executed via a user-provided command
+    - name: Veeam
+      exec: Powershell.exe -File veeam/veeam-stats.ps1
+      interval: 5m
