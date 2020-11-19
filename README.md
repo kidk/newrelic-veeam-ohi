@@ -1,6 +1,12 @@
 # New Relic Veeam on host integration
 
+## Installation
 
+Copy all files to `C:\Program Files\New Relic\newrelic-infra\integrations.d`
+
+Change configuration of ``
+
+Restart the agent: https://docs.newrelic.com/docs/infrastructure/install-infrastructure-agent/manage-your-agent/start-stop-restart-infrastructure-agent
 
 # Thank you to
 

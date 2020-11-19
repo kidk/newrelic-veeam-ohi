@@ -5,10 +5,10 @@
 
 [cmdletbinding()]
 param(
-        [Parameter(Position=0, Mandatory=$false)]
-                [string] $BRHost = "127.0.0.1",
-        [Parameter(Position=1, Mandatory=$false)]
-                $interval = "5" # Number of minutes
+        [Parameter(Position=0, Mandatory=$true)]
+                [string] $Endpoint,
+        [Parameter(Position=1, Mandatory=$true)]
+                $Interval
 )
 
 #region: Start Load VEEAM Snapin (if not already loaded)
@@ -65,20 +65,20 @@ Function Get-vPCRepoInfo {
 }
 #endregion
 
-#region: Start BRHost Connection
+#region: Start endpoint Connection
 $OpenConnection = (Get-VBRServerSession).Server
-if($OpenConnection -eq $BRHost) {
+if($OpenConnection -eq $endpoint) {
 
 } elseif ($null -eq $OpenConnection ) {
-        Connect-VBRServer -Server $BRHost
+        Connect-VBRServer -Server $endpoint
 } else {
         Disconnect-VBRServer
-        Connect-VBRServer -Server $BRHost
+        Connect-VBRServer -Server $endpoint
 }
 
 $NewConnection = (Get-VBRServerSession).Server
 if ($null -eq $NewConnection ) {
-        Write-Error "`nError: BRHost Connection Failed"
+        Write-Error "`nError: endpoint Connection Failed"
         Exit
 }
 #endregion
@@ -206,18 +206,18 @@ $output = @{
         "data" = @(
                 @{
                         "entity" = @{
-                                "name" = $BRHost
+                                "name" = $endpoint
                                 "type" = "veeam-server"
-                                "id_attributes" = @(
-                                        @{
-                                                "key" = "environment"
-                                                "value" = "production"
-                                        },
-                                        @{
-                                                "key" = "environment"
-                                                "value" = "production"
-                                        }
-                                )
+                                # "id_attributes" = @(
+                                #         @{
+                                #                 "key" = "environment"
+                                #                 "value" = "production"
+                                #         },
+                                #         @{
+                                #                 "key" = "environment"
+                                #                 "value" = "production"
+                                #         }
+                                # )
                         }
                         "metrics" = $metrics
                         "inventory" = $()
@@ -228,4 +228,8 @@ $output = @{
 
 $outputJson = $output | ConvertTo-Json -Depth 10
 Write-Host $outputJson
+#endregion
+
+#region: Close connections
+Disconnect-VBRServer
 #endregion
