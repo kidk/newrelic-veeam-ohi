@@ -2,6 +2,8 @@
 
 ## Installation
 
+Install the New Relic Infrastructure agent for Microsoft Windows: https://docs.newrelic.com/docs/infrastructure/install-infrastructure-agent/windows-installation/install-infrastructure-agent-windows-server-using-msi-installer
+
 Copy directory `integrations.d` and `newrelic-integrations` to `C:\Program Files\New Relic\newrelic-infra\`.
 
 The directory structure should look like this:
@@ -14,7 +16,7 @@ newrelic-infra\
         veeam-stats.ps1
 ```
 
-Change configuration of `integrations.d\veeam-monitoring.yaml` with your preffered values.
+Change configuration of `integrations.d\veeam-monitoring.yaml` with your preferred values.
 
 Restart the agent: https://docs.newrelic.com/docs/infrastructure/install-infrastructure-agent/manage-your-agent/start-stop-restart-infrastructure-agent
 
