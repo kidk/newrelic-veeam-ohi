@@ -2,5 +2,8 @@ integrations:
   - name: Veeam
     # First parameter is the host, second parameter is the interval in minutes.
     # Make sure the interval is in sync with the one below
-    exec: .\veeam-status.bat "127.0.0.1" 10
+    exec:
+    - veeam-stats.bat
+    - 127.0.0.1
+    - 10
     interval: 10m
