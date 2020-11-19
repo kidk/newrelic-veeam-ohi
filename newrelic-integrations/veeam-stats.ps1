@@ -226,7 +226,7 @@ $output = @{
         )
 }
 
-$outputJson = $output | ConvertTo-Json -Depth 10
+$outputJson = $output | ConvertTo-Json -Compress -Depth 10
 Write-Host $outputJson
 #endregion
 
