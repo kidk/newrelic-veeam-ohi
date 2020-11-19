@@ -2,9 +2,19 @@
 
 ## Installation
 
-Copy all files to `C:\Program Files\New Relic\newrelic-infra\integrations.d`
+Copy directory `integrations.d` and `newrelic-integrations` to `C:\Program Files\New Relic\newrelic-infra\`.
 
-Change configuration of ``
+The directory structure should look like this:
+```
+newrelic-infra\
+    integrations.d\
+        veeam-monitoring.yaml
+    newrelic-integrations\
+        veeam-stats.bat
+        veeam-stats.ps1
+```
+
+Change configuration of `integrations.d\veeam-monitoring.yaml` with your preffered values.
 
 Restart the agent: https://docs.newrelic.com/docs/infrastructure/install-infrastructure-agent/manage-your-agent/start-stop-restart-infrastructure-agent
 
