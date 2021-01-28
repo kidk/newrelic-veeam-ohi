@@ -4,6 +4,6 @@ integrations:
     - C:\Program Files\New Relic\newrelic-infra\newrelic-integrations\veeam-stats.bat
     # Host of the Veeam server, defaults to localhost
     - 127.0.0.1
-    # Interval of getting data in minutes, defaults to 10 minutes. Please keep this value in sync with the interval below.
-    - 10
-    interval: 10m
+    # Interval of getting data in minutes, defaults to 1 day (60*24)
+    - 1440
+    interval: 60m
